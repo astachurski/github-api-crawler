@@ -1,4 +1,4 @@
-package githubdomain;
+package githubcrawler.dao;
 
 
 import com.fasterxml.jackson.annotation.*;

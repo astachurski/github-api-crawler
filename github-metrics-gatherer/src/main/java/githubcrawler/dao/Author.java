@@ -1,5 +1,5 @@
 
-package githubdomain;
+package githubcrawler.dao;
 
 import com.fasterxml.jackson.annotation.*;
 
@@ -9,14 +9,17 @@ import java.util.Map;
 @JsonInclude(JsonInclude.Include.NON_NULL)
 @JsonPropertyOrder({
         "name",
-        "commit"
+        "email",
+        "date"
 })
-public class GitHubBranch {
+public class Author {
 
     @JsonProperty("name")
     private String name;
-    @JsonProperty("commit")
-    private Commit commit;
+    @JsonProperty("email")
+    private String email;
+    @JsonProperty("date")
+    private String date;
     @JsonIgnore
     private Map<String, Object> additionalProperties = new HashMap<String, Object>();
 
@@ -30,14 +33,24 @@ public class GitHubBranch {
         this.name = name;
     }
 
-    @JsonProperty("commit")
-    public Commit getCommit() {
-        return commit;
+    @JsonProperty("email")
+    public String getEmail() {
+        return email;
     }
 
-    @JsonProperty("commit")
-    public void setCommit(Commit commit) {
-        this.commit = commit;
+    @JsonProperty("email")
+    public void setEmail(String email) {
+        this.email = email;
+    }
+
+    @JsonProperty("date")
+    public String getDate() {
+        return date;
+    }
+
+    @JsonProperty("date")
+    public void setDate(String date) {
+        this.date = date;
     }
 
     @JsonAnyGetter
@@ -50,4 +63,10 @@ public class GitHubBranch {
         this.additionalProperties.put(name, value);
     }
 
+    @Override
+    public String toString() {
+        return "Author{" +
+                "name='" + name + '\'' +
+                '}';
+    }
 }
