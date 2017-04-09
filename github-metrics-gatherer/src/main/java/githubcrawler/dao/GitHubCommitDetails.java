@@ -10,7 +10,7 @@ import java.util.Map;
 @JsonInclude(JsonInclude.Include.NON_NULL)
 @JsonPropertyOrder({
         "sha",
-        "commit",
+        "commitDTO",
         "url",
         "html_url",
         "comments_url",
@@ -22,8 +22,8 @@ public class GitHubCommitDetails {
 
     @JsonProperty("sha")
     private String sha;
-    @JsonProperty("commit")
-    private Commit commit;
+    @JsonProperty("commitDTO")
+    private CommitDTO commitDTO;
     @JsonProperty("url")
     private String url;
     @JsonProperty("html_url")
@@ -49,14 +49,14 @@ public class GitHubCommitDetails {
         this.sha = sha;
     }
 
-    @JsonProperty("commit")
-    public Commit getCommit() {
-        return commit;
+    @JsonProperty("commitDTO")
+    public CommitDTO getCommitDTO() {
+        return commitDTO;
     }
 
-    @JsonProperty("commit")
-    public void setCommit(Commit commit) {
-        this.commit = commit;
+    @JsonProperty("commitDTO")
+    public void setCommitDTO(CommitDTO commitDTO) {
+        this.commitDTO = commitDTO;
     }
 
     @JsonProperty("url")

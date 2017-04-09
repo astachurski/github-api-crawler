@@ -9,14 +9,14 @@ import java.util.Map;
 @JsonInclude(JsonInclude.Include.NON_NULL)
 @JsonPropertyOrder({
         "name",
-        "commit"
+        "commitDTO"
 })
-public class GitHubBranch {
+public class GitHubBranchDTO {
 
     @JsonProperty("name")
     private String name;
-    @JsonProperty("commit")
-    private Commit commit;
+    @JsonProperty("commitDTO")
+    private CommitDTO commitDTO;
     @JsonIgnore
     private Map<String, Object> additionalProperties = new HashMap<String, Object>();
 
@@ -30,14 +30,14 @@ public class GitHubBranch {
         this.name = name;
     }
 
-    @JsonProperty("commit")
-    public Commit getCommit() {
-        return commit;
+    @JsonProperty("commitDTO")
+    public CommitDTO getCommitDTO() {
+        return commitDTO;
     }
 
-    @JsonProperty("commit")
-    public void setCommit(Commit commit) {
-        this.commit = commit;
+    @JsonProperty("commitDTO")
+    public void setCommitDTO(CommitDTO commitDTO) {
+        this.commitDTO = commitDTO;
     }
 
     @JsonAnyGetter

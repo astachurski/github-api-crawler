@@ -15,7 +15,7 @@ import java.util.Map;
         "url",
         "comment_count"
 })
-public class Commit {
+public class CommitDTO {
 
     @JsonProperty("author")
     private Author author;
@@ -102,4 +102,10 @@ public class Commit {
         this.additionalProperties.put(name, value);
     }
 
+    @Override
+    public String toString() {
+        return "CommitDTO{" +
+                "message='" + message + '\'' +
+                '}';
+    }
 }

@@ -79,7 +79,7 @@ import java.util.Map;
         "default_branch",
         "permissions"
 })
-public class GitHubOrgRepo {
+public class GitHubOrgRepoDTO {
 
     @JsonProperty("id")
     private Integer id;
