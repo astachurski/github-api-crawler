@@ -1,5 +1,5 @@
 
-package githubcrawler.dao;
+package githubcrawler.dto;
 
 import com.fasterxml.jackson.annotation.*;
 
@@ -12,7 +12,7 @@ import java.util.Map;
         "push",
         "pull"
 })
-public class Permissions {
+public class PermissionsDTO {
 
     @JsonProperty("admin")
     private Boolean admin;

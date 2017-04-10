@@ -1,9 +1,9 @@
 package githubcrawler.service;
 
 import githubcrawler.GitHubURIconsts;
-import githubcrawler.dao.CommitDTO;
-import githubcrawler.dao.GitHubBranchDTO;
-import githubcrawler.dao.GitHubOrgRepoDTO;
+import githubcrawler.dto.CommitDTO;
+import githubcrawler.dto.GitHubBranchDTO;
+import githubcrawler.dto.GitHubOrgRepoDTO;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.core.ParameterizedTypeReference;
@@ -38,14 +38,13 @@ public class RestGitHubFetcher {
 
         httpHeaders.add("Authorization", GitHubURIconsts.as_token);
 
-        //RequestEntity<GitHubRoot> requestEntity = new RequestEntity<>(httpHeaders, HttpMethod.GET, github_root_uri);
-        //ResponseEntity<GitHubRoot> resp = restTemplate.exchange(requestEntity, GitHubRoot.class);
-        //GitHubRoot gitHubRoot = resp.getBody();
+        //RequestEntity<GitHubRootDTO> requestEntity = new RequestEntity<>(httpHeaders, HttpMethod.GET, github_root_uri);
+        //ResponseEntity<GitHubRootDTO> resp = restTemplate.exchange(requestEntity, GitHubRootDTO.class);
+        //GitHubRootDTO gitHubRoot = resp.getBody();
 
         List<GitHubOrgRepoDTO> reposList = getRepos(org_repos_uri);
 
-        System.out.println("repos count is: " + reposList.size());
-
+        log.info("repos count is: " + reposList.size());
 
         for (GitHubOrgRepoDTO gitHubOrgRepoDTO : reposList) {
 
@@ -55,9 +54,10 @@ public class RestGitHubFetcher {
             log.info(" repository name:  " + gitHubOrgRepoDTO.getName());
             log.info(" default branch: " + gitHubOrgRepoDTO.getDefaultBranch());
 
-            for (GitHubBranchDTO gitHubBranchDTO : branchList) {
-                log.info(gitHubBranchDTO.getName());
-            }
+            if (branchList != null)
+                for (GitHubBranchDTO gitHubBranchDTO : branchList) {
+                    log.info(gitHubBranchDTO.getName());
+                }
 
             String commits_for_repo_uri_str = gitHubOrgRepoDTO.getCommitsUrl();
             URI commits_uri = new URI(commits_for_repo_uri_str.substring(0, branches_uri_str.indexOf("{") - 1));
@@ -76,41 +76,50 @@ public class RestGitHubFetcher {
     }
 
     private List<GitHubBranchDTO> getBranches(String branches_uri_str) throws URISyntaxException {
-        //extract collection resource getting rid of parameter
+        //extract collection resource getting rid of unused parameter
         URI branches_uri = new URI(branches_uri_str.substring(0, branches_uri_str.indexOf("{")));
 
         RequestEntity<GitHubBranchDTO> requestBranchForRepo = new RequestEntity<>(httpHeaders, HttpMethod.GET, branches_uri);
-        ResponseEntity<List<GitHubBranchDTO>> responseEntityBranchesForRepo = restTemplate.exchange(requestBranchForRepo, new ParameterizedTypeReference<List<GitHubBranchDTO>>() {
-        });
-        return responseEntityBranchesForRepo.getBody();
+        try {
+            ResponseEntity<List<GitHubBranchDTO>> responseEntityBranchesForRepo = restTemplate.exchange(requestBranchForRepo, new ParameterizedTypeReference<List<GitHubBranchDTO>>() {
+            });
+            return responseEntityBranchesForRepo.getBody();
+        } catch (Exception e) {
+            log.error(e.getMessage());
+            return null;
+        }
     }
 
     private List<GitHubOrgRepoDTO> getRepos(URI org_repos_uri) {
 
         RequestEntity<GitHubOrgRepoDTO> requestReposForOrg = new RequestEntity<>(httpHeaders, HttpMethod.GET, org_repos_uri);
-        ResponseEntity<List<GitHubOrgRepoDTO>> responseEntityReposForOrg =
-                restTemplate.exchange(requestReposForOrg, new ParameterizedTypeReference<List<GitHubOrgRepoDTO>>() {
-                });
 
-        return responseEntityReposForOrg.getBody();
+        try {
+            ResponseEntity<List<GitHubOrgRepoDTO>> responseEntityReposForOrg =
+                    restTemplate.exchange(requestReposForOrg, new ParameterizedTypeReference<List<GitHubOrgRepoDTO>>() {
+                    });
+            return responseEntityReposForOrg.getBody();
+        } catch (Exception e) {
+            log.error(e.getMessage());
+            return null;
+        }
+
     }
 
     private List<CommitDTO> getCommits(URI commits_uri) {
 
         RequestEntity<CommitDTO> requestCommitForRepo = new RequestEntity<>(httpHeaders, HttpMethod.GET, commits_uri);
         try {
-
             ResponseEntity<List<CommitDTO>> responseEntityCommitsForRepo = restTemplate.exchange(
                     requestCommitForRepo, new ParameterizedTypeReference<List<CommitDTO>>() {
                     });
             List<CommitDTO> commitDTOList = responseEntityCommitsForRepo.getBody();
             return commitDTOList;
-
         } catch (Exception e) {
             log.error(e.getMessage());
+            return null;
         }
-        ;
-        return null;
+
     }
 
 

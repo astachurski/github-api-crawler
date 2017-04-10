@@ -1,5 +1,5 @@
 
-package githubcrawler.dao;
+package githubcrawler.dto;
 
 import com.fasterxml.jackson.annotation.*;
 

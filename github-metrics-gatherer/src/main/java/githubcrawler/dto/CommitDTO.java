@@ -1,5 +1,5 @@
 
-package githubcrawler.dao;
+package githubcrawler.dto;
 
 import com.fasterxml.jackson.annotation.*;
 
@@ -18,13 +18,13 @@ import java.util.Map;
 public class CommitDTO {
 
     @JsonProperty("author")
-    private Author author;
+    private AuthorDTO author;
     @JsonProperty("committer")
-    private Committer committer;
+    private CommitterDTO committer;
     @JsonProperty("message")
     private String message;
     @JsonProperty("tree")
-    private Tree tree;
+    private TreeDTO tree;
     @JsonProperty("url")
     private String url;
     @JsonProperty("comment_count")
@@ -33,22 +33,22 @@ public class CommitDTO {
     private Map<String, Object> additionalProperties = new HashMap<String, Object>();
 
     @JsonProperty("author")
-    public Author getAuthor() {
+    public AuthorDTO getAuthor() {
         return author;
     }
 
     @JsonProperty("author")
-    public void setAuthor(Author author) {
+    public void setAuthor(AuthorDTO author) {
         this.author = author;
     }
 
     @JsonProperty("committer")
-    public Committer getCommitter() {
+    public CommitterDTO getCommitter() {
         return committer;
     }
 
     @JsonProperty("committer")
-    public void setCommitter(Committer committer) {
+    public void setCommitter(CommitterDTO committer) {
         this.committer = committer;
     }
 
@@ -63,12 +63,12 @@ public class CommitDTO {
     }
 
     @JsonProperty("tree")
-    public Tree getTree() {
+    public TreeDTO getTree() {
         return tree;
     }
 
     @JsonProperty("tree")
-    public void setTree(Tree tree) {
+    public void setTree(TreeDTO tree) {
         this.tree = tree;
     }
 

@@ -1,5 +1,5 @@
 
-package githubcrawler.dao;
+package githubcrawler.dto;
 
 import com.fasterxml.jackson.annotation.*;
 
@@ -18,7 +18,7 @@ import java.util.Map;
         "committer",
         "parents"
 })
-public class GitHubCommitDetails {
+public class GitHubCommitDetailsDTO {
 
     @JsonProperty("sha")
     private String sha;
@@ -35,7 +35,7 @@ public class GitHubCommitDetails {
     @JsonProperty("committer")
     private Committer_ committer;
     @JsonProperty("parents")
-    private List<Parent> parents = null;
+    private List<ParentDTO> parents = null;
     @JsonIgnore
     private Map<String, Object> additionalProperties = new HashMap<String, Object>();
 
@@ -110,12 +110,12 @@ public class GitHubCommitDetails {
     }
 
     @JsonProperty("parents")
-    public List<Parent> getParents() {
+    public List<ParentDTO> getParents() {
         return parents;
     }
 
     @JsonProperty("parents")
-    public void setParents(List<Parent> parents) {
+    public void setParents(List<ParentDTO> parents) {
         this.parents = parents;
     }
 

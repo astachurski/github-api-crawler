@@ -1,5 +1,5 @@
 
-package githubcrawler.dao;
+package githubcrawler.dto;
 
 import com.fasterxml.jackson.annotation.*;
 
@@ -26,7 +26,7 @@ import java.util.Map;
         "type",
         "site_admin"
 })
-public class Author_ {
+public class OwnerDTO {
 
     @JsonProperty("login")
     private String login;

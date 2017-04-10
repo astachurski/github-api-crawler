@@ -1,5 +1,5 @@
 
-package githubcrawler.dao;
+package githubcrawler.dto;
 
 import com.fasterxml.jackson.annotation.*;
 
@@ -12,7 +12,7 @@ import java.util.Map;
         "email",
         "date"
 })
-public class Author {
+public class AuthorDTO {
 
     @JsonProperty("name")
     private String name;
@@ -65,7 +65,7 @@ public class Author {
 
     @Override
     public String toString() {
-        return "Author{" +
+        return "AuthorDTO{" +
                 "name='" + name + '\'' +
                 '}';
     }

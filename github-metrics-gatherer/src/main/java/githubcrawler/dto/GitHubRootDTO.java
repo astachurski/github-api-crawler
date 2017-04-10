@@ -1,4 +1,4 @@
-package githubcrawler.dao;
+package githubcrawler.dto;
 
 
 import com.fasterxml.jackson.annotation.*;
@@ -40,7 +40,7 @@ import java.util.Map;
         "user_repositories_url",
         "user_search_url"
 })
-public class GitHubRoot {
+public class GitHubRootDTO {
 
     @JsonProperty("current_user_url")
     private String currentUserUrl;

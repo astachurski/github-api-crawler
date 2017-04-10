@@ -1,5 +1,5 @@
 
-package githubcrawler.dao;
+package githubcrawler.dto;
 
 import com.fasterxml.jackson.annotation.*;
 
@@ -88,7 +88,7 @@ public class GitHubOrgRepoDTO {
     @JsonProperty("full_name")
     private String fullName;
     @JsonProperty("owner")
-    private Owner owner;
+    private OwnerDTO owner;
     @JsonProperty("private")
     private Boolean _private;
     @JsonProperty("html_url")
@@ -220,7 +220,7 @@ public class GitHubOrgRepoDTO {
     @JsonProperty("default_branch")
     private String defaultBranch;
     @JsonProperty("permissions")
-    private Permissions permissions;
+    private PermissionsDTO permissions;
     @JsonIgnore
     private Map<String, Object> additionalProperties = new HashMap<String, Object>();
 
@@ -255,12 +255,12 @@ public class GitHubOrgRepoDTO {
     }
 
     @JsonProperty("owner")
-    public Owner getOwner() {
+    public OwnerDTO getOwner() {
         return owner;
     }
 
     @JsonProperty("owner")
-    public void setOwner(Owner owner) {
+    public void setOwner(OwnerDTO owner) {
         this.owner = owner;
     }
 
@@ -915,12 +915,12 @@ public class GitHubOrgRepoDTO {
     }
 
     @JsonProperty("permissions")
-    public Permissions getPermissions() {
+    public PermissionsDTO getPermissions() {
         return permissions;
     }
 
     @JsonProperty("permissions")
-    public void setPermissions(Permissions permissions) {
+    public void setPermissions(PermissionsDTO permissions) {
         this.permissions = permissions;
     }
 

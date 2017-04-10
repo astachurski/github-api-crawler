@@ -11,7 +11,7 @@ public class RestController {
     private RestGitHubFetcher restGitHubFetcher;
 
     @RequestMapping(value = "/github-metrics", method = RequestMethod.GET)
-    public GitHubMetrics metrics(@RequestParam(value = "test", defaultValue = "dupa") String name) {
+    public GitHubMetrics getGitHubMetrics(@RequestParam(value = "test", defaultValue = "dupa") String name) {
         try {
             restGitHubFetcher.fetchDTOs();
         } catch (Exception e) {

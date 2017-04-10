@@ -1,5 +1,5 @@
 
-package githubcrawler.dao;
+package githubcrawler.dto;
 
 import com.fasterxml.jackson.annotation.*;
 
@@ -11,7 +11,7 @@ import java.util.Map;
         "sha",
         "url"
 })
-public class Tree {
+public class TreeDTO {
 
     @JsonProperty("sha")
     private String sha;
