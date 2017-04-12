@@ -1,5 +1,6 @@
 package githubcrawler;
 
+import githubcrawler.domain.ReportPojo;
 import githubcrawler.service.RestGitHubFetcher;
 import githubcrawler.service.RestController;
 import org.slf4j.Logger;
@@ -39,8 +40,11 @@ public class Application {
     @Bean
     public RestTemplate restTemplate(RestTemplateBuilder builder) {
         return builder.build();
+    }
 
-
+    @Bean
+    public ReportPojo reportPojo() {
+        return new ReportPojo();
     }
 
 

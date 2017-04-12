@@ -1,12 +1,17 @@
 package githubcrawler.service;
 
 import githubcrawler.GitHubURIconsts;
+import githubcrawler.domain.BranchProtectionInfoReport;
+import githubcrawler.domain.GitRepositoryReport;
+import githubcrawler.domain.ReportPojo;
 import githubcrawler.dto.CommitDTO;
 import githubcrawler.dto.GitHubBranchDTO;
 import githubcrawler.dto.GitHubOrgRepoDTO;
+import githubcrawler.dto.branchprotection.BranchProtectionInfo;
 import githubcrawler.dto.commitdetails.CommitDetailsDTO;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpMethod;
@@ -18,6 +23,7 @@ import org.springframework.web.client.RestTemplate;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.util.ArrayList;
+import java.util.Iterator;
 import java.util.List;
 
 
@@ -28,33 +34,40 @@ public class RestGitHubFetcher {
     private RestTemplate restTemplate;
     private HttpHeaders httpHeaders = new HttpHeaders();
 
+    @Autowired
+    public void setReportPojo(ReportPojo reportPojo) {
+        this.reportPojo = reportPojo;
+    }
+
+    private ReportPojo reportPojo;
+
     public RestGitHubFetcher(RestTemplate restTemplate) {
         this.restTemplate = restTemplate;
         httpHeaders.add("Authorization", GitHubURIconsts.as_token);
         httpHeaders.add("Accept", "application/vnd.github.loki-preview+json");
     }
 
-
-    public void fetchDTOs() throws Exception {
-
-        log.info("pik akakakakaka!!!");
-        log.debug("debuuug");
-        log.warn("waaarn");
-
+    /*e einie */
+    public ReportPojo fetchDTOs() throws Exception {
 
         //URI github_root_uri = new URI(GitHubURIconsts.github_url);
         URI org_repos_uri = new URI(GitHubURIconsts.org_repos_url);
 
         //RequestEntity<GitHubRootDTO> requestEntity = new RequestEntity<>(httpHeaders, HttpMethod.GET, github_root_uri);
         //ResponseEntity<GitHubRootDTO> resp = restTemplate.exchange(requestEntity, GitHubRootDTO.class);
-        //GitHubRootDTO gitHubRoot = resp.getBody();
+        //GitHubRootDTO gitHubRoot = resp.getBody();Got
 
         List<GitHubOrgRepoDTO> reposList = getRepos(org_repos_uri);
 
-        log.info("repos count is: " + reposList.size());
+        log.info("repositories count is: " + reposList.size());
 
         //iterate over repos to get branches, commits and repo-specific stuff
         for (GitHubOrgRepoDTO gitHubOrgRepoDTO : reposList) {
+
+            GitRepositoryReport gitRepositoryReport = new GitRepositoryReport();
+            gitRepositoryReport.setName(gitHubOrgRepoDTO.getName());
+            gitRepositoryReport.setActualDefaultBranch(gitHubOrgRepoDTO.getDefaultBranch());
+            reportPojo.addRepoReport(gitRepositoryReport);
 
             String branches_uri_str = gitHubOrgRepoDTO.getBranchesUrl();
             List<GitHubBranchDTO> branchList = getBranches(branches_uri_str);
@@ -64,12 +77,20 @@ public class RestGitHubFetcher {
 
             if (branchList != null)
                 for (GitHubBranchDTO gitHubBranchDTO : branchList) {
+                    gitRepositoryReport.addBranchName(gitHubBranchDTO.getName());
+
                     URI branch_protection_info = new URI(gitHubBranchDTO.getAdditionalProperties().get("protection_url").toString());
                     RequestEntity<String> requestProtectionInfoForBranch = new RequestEntity<>(httpHeaders, HttpMethod.GET, branch_protection_info);
                     try {
-                        ResponseEntity<String> responseProtectionInfoForBranch = restTemplate.exchange(requestProtectionInfoForBranch, new ParameterizedTypeReference<String>() {
+                        ResponseEntity<BranchProtectionInfo> responseProtectionInfoForBranch =
+                                restTemplate.exchange(requestProtectionInfoForBranch, new ParameterizedTypeReference<BranchProtectionInfo>() {
                         });
-                        log.info("protection info :" + responseProtectionInfoForBranch);
+
+                        BranchProtectionInfoReport branchProtectionInfoReport = new BranchProtectionInfoReport();
+                        branchProtectionInfoReport.setIncludeAdministrators(responseProtectionInfoForBranch.getBody().getRequiredStatusChecks().getIncludeAdmins());
+                        gitRepositoryReport.addBranchProtectionInfo(gitHubBranchDTO.getName(), branchProtectionInfoReport);
+
+                        log.info("protection info :" + responseProtectionInfoForBranch.getBody().getRestrictions().toString());
                     } catch (HttpClientErrorException e) {
                         //do nothing.
                         //happens for all NOT SET protections
@@ -86,11 +107,10 @@ public class RestGitHubFetcher {
 
             if (commitDTOList != null)
                 for (CommitDetailsDTO commitDetailsDTO : commitDTOList) {
-                    log.info("commitDTO: " + commitDetailsDTO.getSha());
+                    log.info("commitDTO: " + commitDetailsDTO.getCommit().getMessage());
                 }
         }
-
-
+        return reportPojo;
     }
 
     private List<GitHubBranchDTO> getBranches(String branches_uri_str) throws URISyntaxException {

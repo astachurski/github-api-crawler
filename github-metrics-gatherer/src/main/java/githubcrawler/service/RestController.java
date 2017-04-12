@@ -1,7 +1,10 @@
 package githubcrawler.service;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
+import githubcrawler.domain.ReportPojo;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.*;
+import org.springframework.boot.jackson.JsonObjectDeserializer;
 import org.springframework.web.bind.annotation.*;
 
 @org.springframework.web.bind.annotation.RestController
@@ -11,13 +14,17 @@ public class RestController {
     private RestGitHubFetcher restGitHubFetcher;
 
     @RequestMapping(value = "/github-metrics", method = RequestMethod.GET)
-    public GitHubMetrics getGitHubMetrics(@RequestParam(value = "test", defaultValue = "dupa") String name) {
+    public String getGitHubMetrics(@RequestParam(value = "test", defaultValue = "dupa") String name) {
+        String report = "empty";
         try {
-            restGitHubFetcher.fetchDTOs();
+            ReportPojo reportPojo = restGitHubFetcher.fetchDTOs();
+            ObjectMapper om = new ObjectMapper();
+            report = om.writeValueAsString(reportPojo);
+
         } catch (Exception e) {
             e.printStackTrace();
         }
-        return new GitHubMetrics(name);
+        return report;
     }
     @RequestMapping("/")
     String home() {
