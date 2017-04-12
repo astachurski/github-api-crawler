@@ -11,6 +11,7 @@ import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpMethod;
 import org.springframework.http.RequestEntity;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.client.HttpClientErrorException;
 import org.springframework.web.client.RestTemplate;
 
 import java.net.URI;
@@ -27,16 +28,20 @@ public class RestGitHubFetcher {
 
     public RestGitHubFetcher(RestTemplate restTemplate) {
         this.restTemplate = restTemplate;
+        httpHeaders.add("Authorization", GitHubURIconsts.as_token);
+        httpHeaders.add("Accept", "application/vnd.github.loki-preview+json");
     }
 
 
     public void fetchDTOs() throws Exception {
 
+        log.info("pik akakakakaka!!!");
+        log.debug("debuuug");
+        log.warn("waaarn");
+
 
         //URI github_root_uri = new URI(GitHubURIconsts.github_url);
         URI org_repos_uri = new URI(GitHubURIconsts.org_repos_url);
-
-        httpHeaders.add("Authorization", GitHubURIconsts.as_token);
 
         //RequestEntity<GitHubRootDTO> requestEntity = new RequestEntity<>(httpHeaders, HttpMethod.GET, github_root_uri);
         //ResponseEntity<GitHubRootDTO> resp = restTemplate.exchange(requestEntity, GitHubRootDTO.class);
@@ -44,8 +49,9 @@ public class RestGitHubFetcher {
 
         List<GitHubOrgRepoDTO> reposList = getRepos(org_repos_uri);
 
-        log.info("repos count is: " + reposList.size());
+        System.out.println("repos count is: " + reposList.size());
 
+        //iterate over repos to get branches, commits and repo-specific stuff
         for (GitHubOrgRepoDTO gitHubOrgRepoDTO : reposList) {
 
             String branches_uri_str = gitHubOrgRepoDTO.getBranchesUrl();
@@ -56,7 +62,15 @@ public class RestGitHubFetcher {
 
             if (branchList != null)
                 for (GitHubBranchDTO gitHubBranchDTO : branchList) {
-                    log.info(gitHubBranchDTO.getName());
+                    URI branch_protection_info = new URI(gitHubBranchDTO.getAdditionalProperties().get("protection_url").toString());
+                    RequestEntity<String> requestProtectionInfoForBranch = new RequestEntity<>(httpHeaders, HttpMethod.GET, branch_protection_info);
+                    try {
+                        ResponseEntity<String> responseProtectionInfoForBranch = restTemplate.exchange(requestProtectionInfoForBranch, new ParameterizedTypeReference<String>() {
+                        });
+                        log.info("protection info :" + responseProtectionInfoForBranch);
+                    } catch (HttpClientErrorException e) {
+                        log.warn(e.getMessage());
+                    }
                 }
 
             String commits_for_repo_uri_str = gitHubOrgRepoDTO.getCommitsUrl();
