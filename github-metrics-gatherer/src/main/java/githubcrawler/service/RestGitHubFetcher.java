@@ -4,6 +4,7 @@ import githubcrawler.GitHubURIconsts;
 import githubcrawler.dto.CommitDTO;
 import githubcrawler.dto.GitHubBranchDTO;
 import githubcrawler.dto.GitHubOrgRepoDTO;
+import githubcrawler.dto.commitdetails.CommitDetailsDTO;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.core.ParameterizedTypeReference;
@@ -16,6 +17,7 @@ import org.springframework.web.client.RestTemplate;
 
 import java.net.URI;
 import java.net.URISyntaxException;
+import java.util.ArrayList;
 import java.util.List;
 
 
@@ -49,7 +51,7 @@ public class RestGitHubFetcher {
 
         List<GitHubOrgRepoDTO> reposList = getRepos(org_repos_uri);
 
-        System.out.println("repos count is: " + reposList.size());
+        log.info("repos count is: " + reposList.size());
 
         //iterate over repos to get branches, commits and repo-specific stuff
         for (GitHubOrgRepoDTO gitHubOrgRepoDTO : reposList) {
@@ -69,7 +71,9 @@ public class RestGitHubFetcher {
                         });
                         log.info("protection info :" + responseProtectionInfoForBranch);
                     } catch (HttpClientErrorException e) {
-                        log.warn(e.getMessage());
+                        //do nothing.
+                        //happens for all NOT SET protections
+                        //log.warn(e.getMessage());
                     }
                 }
 
@@ -78,11 +82,11 @@ public class RestGitHubFetcher {
 
             log.info("commits for repo uri: " + commits_uri.toURL().toString());
 
-            List<CommitDTO> commitDTOList = getCommits(commits_uri);
+            List<CommitDetailsDTO> commitDTOList = getCommits(commits_uri);
 
             if (commitDTOList != null)
-                for (CommitDTO commitDTO : commitDTOList) {
-                    log.info("commitDTO: " + commitDTO.toString());
+                for (CommitDetailsDTO commitDetailsDTO : commitDTOList) {
+                    log.info("commitDTO: " + commitDetailsDTO.getSha());
                 }
         }
 
@@ -120,15 +124,29 @@ public class RestGitHubFetcher {
 
     }
 
-    private List<CommitDTO> getCommits(URI commits_uri) {
+    private List<CommitDetailsDTO> getCommits(URI commits_uri) {
 
-        RequestEntity<CommitDTO> requestCommitForRepo = new RequestEntity<>(httpHeaders, HttpMethod.GET, commits_uri);
+        RequestEntity<CommitDTO> commitForRepoRequest = new RequestEntity<>(httpHeaders, HttpMethod.GET, commits_uri);
         try {
             ResponseEntity<List<CommitDTO>> responseEntityCommitsForRepo = restTemplate.exchange(
-                    requestCommitForRepo, new ParameterizedTypeReference<List<CommitDTO>>() {
+                    commitForRepoRequest, new ParameterizedTypeReference<List<CommitDTO>>() {
                     });
             List<CommitDTO> commitDTOList = responseEntityCommitsForRepo.getBody();
-            return commitDTOList;
+
+            List<CommitDetailsDTO> commitDetailsList = new ArrayList<>();
+
+            if (commitDTOList != null)
+                for (CommitDTO commitDTO : commitDTOList) {
+                    //String commitDetailsUrl = commitDTO.getUrl();
+                    URI commitDetailsUri = new URI(commitDTO.getUrl());
+                    RequestEntity<CommitDetailsDTO> commitDetailsRequest = new RequestEntity<>(httpHeaders, HttpMethod.GET, commitDetailsUri);
+                    ResponseEntity<CommitDetailsDTO> commitDetailsResponse = restTemplate.exchange(commitDetailsRequest, new ParameterizedTypeReference<CommitDetailsDTO>() {
+                    });
+                    commitDetailsList.add(commitDetailsResponse.getBody());
+                    //log.info("commit details: " + commitDetailsResponse.);
+                }
+
+            return commitDetailsList;
         } catch (Exception e) {
             log.error(e.getMessage());
             return null;
